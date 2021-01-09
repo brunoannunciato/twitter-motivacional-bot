@@ -1,4 +1,6 @@
 const Jimp = require('jimp')
+const path = require('path')
+const fs = require('fs')
 
 const Fonts = require('./FontsController')
 
@@ -15,17 +17,22 @@ const ImageController = {
 
     return font64
   },
+  getBackground: function() {
+    const backgroundsPath = path.join(__dirname, '../rawImages')
+    const backgroundImages = fs.readdirSync(backgroundsPath)
+    const sortedImage = backgroundImages[Math.floor(Math.random() * backgroundImages.length)]
+    
+    return `${ backgroundsPath }/${ sortedImage }`
+  },
   getAuthorPosition: function(font, text) {
     const textHeight = Jimp.measureTextHeight(font, text.content, 1024)
 
     return textHeight
   },
-  generate: async function(imageConfig, text) {
-    const image = await Jimp.read(imageConfig.path)
+  generate: async function (text) {
+    const image = await Jimp.read(this.getBackground())
     const textFont = await this.getFont(text.content)
     const creditFont = await Jimp.loadFont(Fonts.comicSams16Yellow)
-
-    
 
     image.print(
       textFont,
