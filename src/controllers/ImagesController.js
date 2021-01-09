@@ -3,6 +3,18 @@ const Jimp = require('jimp')
 const Fonts = require('./FontsController')
 
 const ImageController = {
+  getFont: async function(text) {
+    const font64 = await Jimp.loadFont(Fonts.comicSams64Yellow)
+    const font32 = await Jimp.loadFont(Fonts.comicSams32Yellow)
+    const lineWidth = 1024
+    const textWidth = Jimp.measureText(font64, text)
+
+    if (textWidth >= lineWidth) {
+      return font32
+    }
+
+    return font64
+  },
   getAuthorPosition: function(font, text) {
     const textHeight = Jimp.measureTextHeight(font, text.content, 1024)
 
@@ -10,8 +22,10 @@ const ImageController = {
   },
   generate: async function(imageConfig, text) {
     const image = await Jimp.read(imageConfig.path)
-    const textFont = await Jimp.loadFont(Fonts.comicSams64Yellow);
-    const creditFont = await Jimp.loadFont(Fonts.comicSams16Yellow);
+    const textFont = await this.getFont(text.content)
+    const creditFont = await Jimp.loadFont(Fonts.comicSams16Yellow)
+
+    
 
     image.print(
       textFont,
