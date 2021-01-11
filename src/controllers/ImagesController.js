@@ -25,7 +25,8 @@ const ImageController = {
     return `${ backgroundsPath }/${ sortedImage }`
   },
   getAuthorPosition: function(font, text) {
-    const textHeight = Jimp.measureTextHeight(font, text.content, 1024)
+    const lineWillBreak = Jimp.measureText(font, text.content) > 1024
+    const textHeight = Jimp.measureTextHeight(font, text.content, lineWillBreak ? 750 : 1024)
 
     return textHeight
   },
@@ -33,6 +34,8 @@ const ImageController = {
     const image = await Jimp.read(this.getBackground())
     const textFont = await this.getFont(text.content)
     const creditFont = await Jimp.loadFont(Fonts.comicSams16Yellow)
+    const lineWillBreak = Jimp.measureText(textFont, text.content) > 1024
+
 
     image.print(
       textFont,
@@ -43,7 +46,7 @@ const ImageController = {
         alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
         alignmentY: Jimp.VERTICAL_ALIGN_TOP
       },
-      1024,
+      lineWillBreak ? 750 : 1024,
       400
     )
     .print(
